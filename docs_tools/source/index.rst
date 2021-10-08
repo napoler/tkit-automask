@@ -3,8 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-文档
+tkitAutoMask文档
 ======================================
+
+自动构建掩码
+
+安装
+
+pip install tkitAutoMask
+
+https://github.com/napoler/tkit-automask
+
+
 
 .. toctree::
    :maxdepth: 2
