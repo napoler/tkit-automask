@@ -39,7 +39,7 @@ class autoMask(nn.Module):
     动态mask数据
 
     示例
-    ```
+    
     from transformers import BertTokenizer
     tokenizer = BertTokenizer.from_pretrained("uer/chinese_roberta_L-2_H-128") 
     # dir(tokenizer)
@@ -51,7 +51,7 @@ class autoMask(nn.Module):
         replace_prob = 0.90,        # ~10% probability that token will not be masked, but included in loss, as detailed in the epaper
         mask_ignore_token_ids = [tokenizer.cls_token_id,tokenizer.eos_token_id]  # other tokens to exclude from masking, include the [cls] and [sep] here
     )
-    ```
+ 
 
     """
     def __init__(
