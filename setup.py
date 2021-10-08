@@ -6,9 +6,9 @@ import time
 
 # 这里是基本的信息
 
-name='tkitDemo'#修改包名字-
-version='0.0.0.2'+str(time.time())[:8]
-description='Terry toolkit Demo,'
+name='tkitAutoMask'#修改包名字-
+version='0.0.0.1'+str(time.time())[:8]
+description='Terry toolkit tkitAutoMask,'
 author='Terry Chan'
 author_email='napoler2008@gmail.com'
 url='http://docs.terrychan.org/tkit-lr-pytorch/'
@@ -56,12 +56,12 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     #依赖文件
-    # install_requires=[
-    #     # 'beautifulsoup4==4.7.1',
+    install_requires=[
+        # 'beautifulsoup4==4.7.1',
 
 
-    # ],
-    packages=['Demo'],  # 扫描的目录
+    ],
+    packages=['tkitAutoMask'],  # 扫描的目录
     nclude_package_data=True,  # 打包包含静态文件标识
     )
 

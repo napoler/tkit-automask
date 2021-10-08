@@ -13,6 +13,8 @@ pip install sphinx-book-theme
 pip install sphinx_rtd_theme
 
 
+pip install pytorch
+
 # https://github.com/lotharschulz/sphinx-pages
 pip install sphinx-autobuild 
 #markdown基础支持
@@ -25,7 +27,7 @@ rm -rf ../docs
 #清理之前生成的文档
 rm -rf ./source/res/
 #扫描目录 Demo
-sphinx-apidoc -o ./source/res ../Demo
+sphinx-apidoc -o ./source/res ../tkitAutoMask
 
 #编译成为html
 #make html
