@@ -80,7 +80,11 @@ class autoMask(nn.Module):
         self.mask_token_id = mask_token_id
         self.mask_ignore_token_ids = set([*mask_ignore_token_ids, pad_token_id])
 
-    def forward(self, input, **kwargs):
+    def forward(self, input,indices=False, **kwargs):
+        """
+        indices :获取mask的索引
+        
+        """
         # do not mask [pad] tokens, or any other tokens in the tokens designated to be excluded ([cls], [sep])
         # also do not include these special tokens in the tokens chosen at random
         no_mask = mask_with_tokens(input, self.mask_ignore_token_ids)
@@ -108,8 +112,10 @@ class autoMask(nn.Module):
 
         # mask out any tokens to padding tokens that were not originally going to be masked
         labels = input.masked_fill(~mask, self.pad_token_id)
-
-        return masked_input,labels
+        if maskindices==True:
+            return masked_input,labels,maskindices
+        else:
+            return masked_input,labels
 
         # # get generator output and get mlm loss
         # logits = self.transformer(masked_input, **kwargs)
