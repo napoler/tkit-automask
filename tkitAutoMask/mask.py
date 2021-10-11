@@ -112,7 +112,7 @@ class autoMask(nn.Module):
 
         # mask out any tokens to padding tokens that were not originally going to be masked
         labels = input.masked_fill(~mask, self.pad_token_id)
-        if maskindices==True:
+        if indices==True:
             return masked_input,labels,maskindices
         else:
             return masked_input,labels
