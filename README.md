@@ -1,6 +1,7 @@
 # tkitAutoMask
 
 自动构建掩码
+加入多种动态掩码合集，上下三角和动态片段
 
 ```
 pip install tkitAutoMask
