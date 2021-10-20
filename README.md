@@ -20,7 +20,7 @@ tomask = autoMask(
     # transformer,
     mask_token_id = tokenizer.mask_token_id,          # the token id reserved for masking
     pad_token_id = tokenizer.pad_token_id,           # the token id for padding
-    mask_prob = 0.05,           # masking probability for masked language modeling
+    mask_prob = 0.05,           # 仅仅是常规的掩码比例 masking probability for masked language modeling
     replace_prob = 0.90,        # ~10% probability that token will not be masked, but included in loss, as detailed in the epaper
     mask_ignore_token_ids = [tokenizer.cls_token_id,tokenizer.eos_token_id]  # other tokens to exclude from masking, include the [cls] and [sep] here
 )
