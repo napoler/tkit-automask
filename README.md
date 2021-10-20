@@ -79,6 +79,11 @@ tensor([[1., 0., 0., 0., 0.],
 
 ```
 
+
+其他测试
+
+https://colab.research.google.com/drive/1CvkoJ1pZQDRWGPA-5IzJufvocBM-RVT2#scrollTo=UwkociF5ZF-d
+
 详细参考
 
 > dev.md
