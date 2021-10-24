@@ -7,7 +7,7 @@ import time
 # 这里是基本的信息
 
 name='tkitAutoMask'#修改包名字-
-version='0.0.0.1'+str(time.time())[:8]
+version='0.0.0.3'+str(time.time())[:8]
 description='Terry toolkit tkitAutoMask,'
 author='Terry Chan'
 author_email='napoler2008@gmail.com'
