@@ -26,7 +26,7 @@ tokenizer = BertTokenizer.from_pretrained("uer/chinese_roberta_L-2_H-128")
 tomask = autoMask(
     # transformer,
     mask_token_id = tokenizer.mask_token_id,          # the token id reserved for masking
-    pad_token_id = tokenizer.pad_token_id,           # the token id for padding
+    pad_token_id = -100,           # the token id for padding
     mask_prob = 0.05,           # 仅仅是常规的掩码比例 masking probability for masked language modeling
     replace_prob = 0.90,        # ~10% probability that token will not be masked, but included in loss, as detailed in the epaper
     mask_ignore_token_ids = [tokenizer.cls_token_id,tokenizer.eos_token_id]  # other tokens to exclude from masking, include the [cls] and [sep] here
@@ -40,7 +40,9 @@ for i in range(100):
   print(b)
  
 ```
-
+labels：形状为[batch_size, seq_length] ，代表MLM任务的标签，注意这里对于原本未被遮盖的词设置为-100，被遮盖词才会有它们对应的id，和任务设置是反过来的。
+例如，原始句子是I want to [MASK] an apple，这里我把单词eat给遮住了输入模型，对应的label设置为[-100, -100, -100, 【eat对应的id】, -100, -100]；
+为什么要设置为-100而不是其他数？ 因为torch.nn.CrossEntropyLoss默认的ignore_index=-100，也就是说对于标签为100的类别输入不会计算loss。
 
 ```
 tensor([[1., 1., 1., 0., 1.],
