@@ -35,3 +35,6 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+作者博客
+https://www.terrychan.org/
