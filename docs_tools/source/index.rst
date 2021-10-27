@@ -10,7 +10,7 @@ tkitAutoMask文档
 
 安装
 
-pip install tkitAutoMask
+>>> pip install tkitAutoMask
 
 https://github.com/napoler/tkit-automask
 
