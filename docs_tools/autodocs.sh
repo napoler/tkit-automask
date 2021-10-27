@@ -13,7 +13,7 @@ pip install sphinx-book-theme
 pip install sphinx_rtd_theme
 
 
-pip install torch
+pip install torch numpy
 
 # https://github.com/lotharschulz/sphinx-pages
 pip install sphinx-autobuild 
