@@ -9,22 +9,29 @@
 import torch
 def unilm_mask(inputs, s):
     """
-    ```
-    x=torch.ones(10,10)
-    t1=torch.zeros(10,5)
+    
+    Example:
+    
+    >>> x=torch.ones(10,10)
+     >>> t1=torch.zeros(10,5)
 
-    t=torch.ones(10,5)
+    >>>  t=torch.ones(10,5)
 
-    t=torch.cat((t1,t),-1)
-    unilm_mask_out= unilm_mask(x,t)
-    print("unilm_mask",unilm_mask_out)
+    >>>  t=torch.cat((t1,t),-1)
+     >>> unilm_mask_out= unilm_mask(x,t)
+     >>> print("unilm_mask",unilm_mask_out)
     
     
-    ```
-    
-    
+unilm_mask tensor([[[1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+         [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+         [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+         [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+         [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+         [1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+         [1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+         [1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+         [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
          [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
-
         [[1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
          [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
          [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
