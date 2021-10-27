@@ -105,20 +105,22 @@ def get_mask_subset_with_prob_diagonal(mask, prob,subset_with_prob=True):
 class autoMask(nn.Module):
     """
     动态mask数据
+    
     示例
     
-    from transformers import BertTokenizer
-    tokenizer = BertTokenizer.from_pretrained("uer/chinese_roberta_L-2_H-128") 
+    >>> from transformers import BertTokenizer
+     >>> tokenizer = BertTokenizer.from_pretrained("uer/chinese_roberta_L-2_H-128") 
     # dir(tokenizer)
-    tomask = autoMask(
-        # transformer,
-        mask_token_id = tokenizer.mask_token_id,          # the token id reserved for masking
-        pad_token_id = tokenizer.pad_token_id,           # the token id for padding
-        mask_prob = 0.05,           # masking probability for masked language modeling
-        replace_prob = 0.90,        # ~10% probability that token will not be masked, but included in loss, as detailed in the epaper
-        mask_ignore_token_ids = [tokenizer.cls_token_id,tokenizer.eos_token_id]  # other tokens to exclude from masking, include the [cls] and [sep] here
-    )
+     >>> tomask = autoMask(
+    >>>     # transformer,
+     >>>     mask_token_id = tokenizer.mask_token_id,          # the token id reserved for masking
+     >>>    pad_token_id = tokenizer.pad_token_id,           # the token id for padding
+     >>>    mask_prob = 0.05,           # masking probability for masked language modeling
+     >>>    replace_prob = 0.90,        # ~10% probability that token will not be masked, but included in loss, as detailed in the epaper
+     >>>    mask_ignore_token_ids = [tokenizer.cls_token_id,tokenizer.eos_token_id]  # other tokens to exclude from masking, include the [cls] and [sep] here
+    >>>  )
  
+ 修改默认的pad和mask_token_id 默认使用https://huggingface.co/uer/chinese_roberta_L-2_H-128/blob/main/vocab.txt
     """
     def __init__(
         self,
@@ -127,10 +129,11 @@ class autoMask(nn.Module):
         replace_prob = 0.9,
         num_tokens = None,
         random_token_prob = 0.,
-        mask_token_id = 2,
-        pad_token_id = 0,
+        mask_token_id = 103,
+        pad_token_id = -100,
         mask_ignore_token_ids = [],
         probabilitis = [0.5,0.25,0.25]):
+        
         super().__init__()
 
         # self.transformer = transformer
