@@ -156,6 +156,9 @@ https://colab.research.google.com/drive/1CvkoJ1pZQDRWGPA-5IzJufvocBM-RVT2#scroll
 
 https://colab.research.google.com/drive/1kNHD0I0wH3WBpJXPdgZqs0MZTRnGD-ok#scrollTo=6M1ZXRsuxZAa
 
+unilm_mask注意力写法
+https://colab.research.google.com/drive/11IDalP2xNYWzF4gIz6T3yTjp53UqzkOe#scrollTo=gFeycxpykrCx
+
 详细参考
 
 > dev.md
