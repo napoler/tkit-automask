@@ -132,7 +132,7 @@ class autoMask(nn.Module):
         mask_token_id = 103,
         pad_token_id = -100,
         mask_ignore_token_ids = [],
-        probabilitis = [0.5,0.25,0.25]):
+        probabilitis = [0.9,0.05,0.05]):
         
         super().__init__()
 
