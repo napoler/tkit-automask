@@ -35,6 +35,8 @@ print(dir(mk))
 
 
 out = mk.mask(inputs['input_ids'])
+# (array([  103,   100,   117,  5745, 13030,  8310, 12322,  8154,   102]), array([  101,     0,     0,  8422,     0,     0, 12322,     0,   102]), None)
+
 print(out)
 
 
