@@ -7,7 +7,7 @@ Blog: https://terrychan.org
 """
 import os
 from tkitAutoMask import BertRandomMaskingScheme
-
+from types import SimpleNamespace
 from transformers import BertTokenizer, BertModel
 import torch
 tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')
@@ -29,10 +29,10 @@ inputs = tokenizer([text]*5, padding="max_length", max_length=MAX_LENGTH, trunca
 # tokenizer
 
 print("inputs",inputs)
-class ARG:
-  def __init__(self):
-    self.mask_ratio=0.15
-args=ARG()
+# class ARG:
+#   def __init__(self):
+#     self.mask_ratio=0.15
+args=SimpleNamespace(mask_ratio=0.15)
 args.mask_ratio
 
 # tokens=21128
