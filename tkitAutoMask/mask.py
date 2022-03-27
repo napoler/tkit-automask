@@ -78,7 +78,9 @@ def get_mask_subset_with_prob_diagonal(mask, prob,subset_with_prob=True):
     batch, seq_len, device = *mask.shape, mask.device
 
     x = mask.triu() # diagonal 设置偏移
-    diagonal=random.randint(1,int(seq_len/2)) # 生成随机的掩盖长度
+#     diagonal=random.randint(1,int(seq_len/2)) # 生成随机的掩盖长度
+    # 设置最大的掩盖长度
+    diagonal=random.randint(1,6) # 生成随机的掩盖长度
     y = mask.tril(diagonal=diagonal) # diagonal 设置偏移
     a_mask=torch.where(y==0,y,x)
 
