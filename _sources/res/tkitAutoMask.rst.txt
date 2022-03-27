@@ -1,0 +1,37 @@
+tkitAutoMask package
+====================
+
+Submodules
+----------
+
+tkitAutoMask.attention\_mask module
+-----------------------------------
+
+.. automodule:: tkitAutoMask.attention_mask
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tkitAutoMask.mask module
+------------------------
+
+.. automodule:: tkitAutoMask.mask
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tkitAutoMask.spanmask module
+----------------------------
+
+.. automodule:: tkitAutoMask.spanmask
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: tkitAutoMask
+   :members:
+   :undoc-members:
+   :show-inheritance:

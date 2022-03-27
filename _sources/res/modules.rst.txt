@@ -1,0 +1,7 @@
+tkitAutoMask
+============
+
+.. toctree::
+   :maxdepth: 4
+
+   tkitAutoMask

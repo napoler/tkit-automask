@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-cn" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tkitAutoMask.mask &mdash; tkitAutoMask 0.0.0.1  文档</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> tkitAutoMask
+          </a>
+              <div class="version">
+                0.0.0.1 
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="在文档中搜索" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div>
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Main">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../res/modules.html">tkitAutoMask</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" aria-label="Top" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">tkitAutoMask</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+<div role="navigation" aria-label="Breadcrumbs">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">模块代码</a> &raquo;</li>
+      <li>tkitAutoMask.mask</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>tkitAutoMask.mask 源代码</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">reduce</span>
+<span class="c1"># import pytorch_lightning as pl</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># helpers</span>
+
+<div class="viewcode-block" id="prob_mask_like"><a class="viewcode-back" href="../../res/tkitAutoMask.html#tkitAutoMask.mask.prob_mask_like">[文档]</a><span class="k">def</span> <span class="nf">prob_mask_like</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">prob</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">prob</span></div>
+
+<div class="viewcode-block" id="mask_with_tokens"><a class="viewcode-back" href="../../res/tkitAutoMask.html#tkitAutoMask.mask.mask_with_tokens">[文档]</a><span class="k">def</span> <span class="nf">mask_with_tokens</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">token_ids</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    用记号遮掩</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">init_no_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">acc</span><span class="p">,</span> <span class="n">el</span><span class="p">:</span> <span class="n">acc</span> <span class="o">|</span> <span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="n">el</span><span class="p">),</span> <span class="n">token_ids</span><span class="p">,</span> <span class="n">init_no_mask</span><span class="p">)</span>
+
+    <span class="c1"># print(&quot;mask&quot;,mask)</span>
+    <span class="k">return</span> <span class="n">mask</span></div>
+
+<div class="viewcode-block" id="get_mask_subset_with_prob"><a class="viewcode-back" href="../../res/tkitAutoMask.html#tkitAutoMask.mask.get_mask_subset_with_prob">[文档]</a><span class="k">def</span> <span class="nf">get_mask_subset_with_prob</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">prob</span><span class="p">):</span>
+    <span class="n">batch</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="o">*</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">max_masked</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">prob</span> <span class="o">*</span> <span class="n">seq_len</span><span class="p">)</span>
+
+    <span class="n">num_tokens</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mask_excess</span> <span class="o">=</span> <span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">num_tokens</span> <span class="o">*</span> <span class="n">prob</span><span class="p">)</span><span class="o">.</span><span class="n">ceil</span><span class="p">())</span>
+    <span class="n">mask_excess</span> <span class="o">=</span> <span class="n">mask_excess</span><span class="p">[:,</span> <span class="p">:</span><span class="n">max_masked</span><span class="p">]</span>
+
+    <span class="n">rand</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">((</span><span class="n">batch</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="o">~</span><span class="n">mask</span><span class="p">,</span> <span class="o">-</span><span class="mf">1e9</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">sampled_indices</span> <span class="o">=</span> <span class="n">rand</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">max_masked</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sampled_indices</span> <span class="o">=</span> <span class="p">(</span><span class="n">sampled_indices</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">masked_fill_</span><span class="p">(</span><span class="n">mask_excess</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">new_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch</span><span class="p">,</span> <span class="n">seq_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">new_mask</span><span class="o">.</span><span class="n">scatter_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sampled_indices</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_mask</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_mask_subset_with_prob_tri"><a class="viewcode-back" href="../../res/tkitAutoMask.html#tkitAutoMask.mask.get_mask_subset_with_prob_tri">[文档]</a><span class="k">def</span> <span class="nf">get_mask_subset_with_prob_tri</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span><span class="n">subset_with_prob</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;优化版本  三角形 动态掩盖  对屏蔽的数据进行放弃一部分</span>
+<span class="sd">    上三角和下三角自动随机选择</span>
+
+<span class="sd">    # 添加按照比例 subset_with_prob 掩码</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="n">batch</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="o">*</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">device</span>
+    <span class="c1"># 自动选择头尾</span>
+    <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+      <span class="n">a_mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">diagonal</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># diagonal 设置偏移</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">a_mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">diagonal</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># diagonal 设置偏移</span>
+    <span class="c1"># a_mask.bool()</span>
+    <span class="n">mask1</span><span class="o">=</span><span class="n">a_mask</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+
+    <span class="c1"># print(&quot;mask1&quot;,mask1)</span>
+    
+    <span class="k">if</span> <span class="n">subset_with_prob</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+      <span class="c1"># 融合概率mask</span>
+      <span class="n">mask2</span><span class="o">=</span><span class="n">get_mask_subset_with_prob</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span><span class="n">prob</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+      <span class="c1"># print(&quot;mask2&quot;,mask2)</span>
+      <span class="c1"># print(&quot;mask1&quot;,mask1)</span>
+      <span class="n">a_mask</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask1</span><span class="o">==</span><span class="kc">True</span><span class="p">,</span><span class="n">mask1</span><span class="p">,</span><span class="n">mask2</span><span class="p">)</span>
+      <span class="c1"># a_mask=torch.where(a_mask==False,a_mask,mask2)</span>
+      <span class="c1"># a_mask=get_mask_subset_with_prob(a_mask,prob)</span>
+      <span class="k">return</span> <span class="n">a_mask</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">mask1</span></div>
+
+<div class="viewcode-block" id="get_mask_subset_with_prob_diagonal"><a class="viewcode-back" href="../../res/tkitAutoMask.html#tkitAutoMask.mask.get_mask_subset_with_prob_diagonal">[文档]</a><span class="k">def</span> <span class="nf">get_mask_subset_with_prob_diagonal</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span><span class="n">subset_with_prob</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;优化版本  对角线矩阵掩盖</span>
+<span class="sd">    迭代中会自动随机掩盖  实现连续多个 掩盖。用于预测片段内容</span>
+
+<span class="sd">    # 添加按照比例 subset_with_prob 掩码</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="n">batch</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="o">*</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">device</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">triu</span><span class="p">()</span> <span class="c1"># diagonal 设置偏移</span>
+<span class="c1">#     diagonal=random.randint(1,int(seq_len/2)) # 生成随机的掩盖长度</span>
+    <span class="c1"># 设置最大的掩盖长度</span>
+    <span class="n">diagonal</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">seq_len</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">max_d</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="n">diagonal</span><span class="p">)</span>
+    <span class="n">diagonal</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">max_d</span><span class="p">)</span> <span class="c1"># 生成随机的掩盖长度</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">diagonal</span><span class="o">=</span><span class="n">diagonal</span><span class="p">)</span> <span class="c1"># diagonal 设置偏移</span>
+    <span class="n">a_mask</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># a_mask.bool()</span>
+    <span class="n">mask1</span><span class="o">=</span><span class="n">a_mask</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+
+    <span class="c1"># print(&quot;mask1&quot;,mask1)</span>
+    
+    <span class="k">if</span> <span class="n">subset_with_prob</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+      <span class="c1"># 融合概率mask</span>
+      <span class="n">mask2</span><span class="o">=</span><span class="n">get_mask_subset_with_prob</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span><span class="n">prob</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+      <span class="c1"># print(&quot;mask2&quot;,mask2)</span>
+      <span class="c1"># print(&quot;mask1&quot;,mask1)</span>
+      <span class="n">a_mask</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask1</span><span class="o">==</span><span class="kc">True</span><span class="p">,</span><span class="n">mask1</span><span class="p">,</span><span class="n">mask2</span><span class="p">)</span>
+      <span class="c1"># a_mask=torch.where(a_mask==False,a_mask,mask2)</span>
+      <span class="c1"># a_mask=get_mask_subset_with_prob(a_mask,prob)</span>
+      <span class="k">return</span> <span class="n">a_mask</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">mask1</span></div>
+<span class="c1"># main class</span>
+
+
+<span class="c1"># main class</span>
+<div class="viewcode-block" id="autoMask"><a class="viewcode-back" href="../../res/tkitAutoMask.html#tkitAutoMask.mask.autoMask">[文档]</a><span class="k">class</span> <span class="nc">autoMask</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    动态mask数据</span>
+<span class="sd">    </span>
+<span class="sd">    示例</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; from transformers import BertTokenizer</span>
+<span class="sd">     &gt;&gt;&gt; tokenizer = BertTokenizer.from_pretrained(&quot;uer/chinese_roberta_L-2_H-128&quot;) </span>
+<span class="sd">    # dir(tokenizer)</span>
+<span class="sd">     &gt;&gt;&gt; tomask = autoMask(</span>
+<span class="sd">    &gt;&gt;&gt;     # transformer,</span>
+<span class="sd">     &gt;&gt;&gt;     mask_token_id = tokenizer.mask_token_id,          # the token id reserved for masking</span>
+<span class="sd">     &gt;&gt;&gt;    pad_token_id = tokenizer.pad_token_id,           # the token id for padding</span>
+<span class="sd">     &gt;&gt;&gt;    mask_prob = 0.05,           # masking probability for masked language modeling</span>
+<span class="sd">     &gt;&gt;&gt;    replace_prob = 0.90,        # ~10% probability that token will not be masked, but included in loss, as detailed in the epaper</span>
+<span class="sd">     &gt;&gt;&gt;    mask_ignore_token_ids = [tokenizer.cls_token_id,tokenizer.eos_token_id]  # other tokens to exclude from masking, include the [cls] and [sep] here</span>
+<span class="sd">    &gt;&gt;&gt;  )</span>
+<span class="sd"> </span>
+<span class="sd"> 修改默认的pad和mask_token_id 默认使用https://huggingface.co/uer/chinese_roberta_L-2_H-128/blob/main/vocab.txt</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="c1"># transformer,</span>
+        <span class="n">mask_prob</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">,</span>
+        <span class="n">replace_prob</span> <span class="o">=</span> <span class="mf">0.9</span><span class="p">,</span>
+        <span class="n">num_tokens</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">random_token_prob</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span>
+        <span class="n">mask_token_id</span> <span class="o">=</span> <span class="mi">103</span><span class="p">,</span>
+        <span class="n">pad_token_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">mask_ignore_token_ids</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">probabilitis</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.05</span><span class="p">]):</span>
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># self.transformer = transformer</span>
+
+        <span class="c1"># mlm related probabilities</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_prob</span> <span class="o">=</span> <span class="n">mask_prob</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_prob</span> <span class="o">=</span> <span class="n">replace_prob</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_tokens</span> <span class="o">=</span> <span class="n">num_tokens</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_token_prob</span> <span class="o">=</span> <span class="n">random_token_prob</span>
+
+        <span class="c1"># token ids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="o">=</span> <span class="n">pad_token_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_token_id</span> <span class="o">=</span> <span class="n">mask_token_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_ignore_token_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="o">*</span><span class="n">mask_ignore_token_ids</span><span class="p">,</span> <span class="n">pad_token_id</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">probabilitis</span><span class="o">=</span><span class="n">probabilitis</span>
+
+<div class="viewcode-block" id="autoMask.forward"><a class="viewcode-back" href="../../res/tkitAutoMask.html#tkitAutoMask.mask.autoMask.forward">[文档]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span><span class="n">indices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        indices :获取mask的索引</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># do not mask [pad] tokens, or any other tokens in the tokens designated to be excluded ([cls], [sep])</span>
+        <span class="c1"># 不要屏蔽[pad]令牌或指定排除的令牌中的任何其他令牌（[cls]、[sep]）</span>
+        <span class="c1"># also do not include these special tokens in the tokens chosen at random</span>
+        <span class="c1"># 也不要在随机选择的令牌中包含这些特殊令牌</span>
+        <span class="n">no_mask</span> <span class="o">=</span> <span class="n">mask_with_tokens</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_ignore_token_ids</span><span class="p">)</span>
+        <span class="c1"># mask = get_mask_subset_with_prob(~no_mask, self.mask_prob)</span>
+
+        <span class="c1"># 设置每种方案的概率</span>
+        
+        <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">probabilitis</span><span class="p">),</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">probabilitis</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+          <span class="c1"># 默认 概率掩盖</span>
+          <span class="n">mask</span> <span class="o">=</span> <span class="n">get_mask_subset_with_prob</span><span class="p">(</span><span class="o">~</span><span class="n">no_mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_prob</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+          <span class="c1"># 随机上下三角</span>
+          <span class="n">mask</span> <span class="o">=</span> <span class="n">get_mask_subset_with_prob_tri</span><span class="p">(</span><span class="o">~</span><span class="n">no_mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_prob</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="c1"># 对角线 相当于 连续掩盖</span>
+          <span class="n">mask</span> <span class="o">=</span> <span class="n">get_mask_subset_with_prob_diagonal</span><span class="p">(</span><span class="o">~</span><span class="n">no_mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_prob</span><span class="p">)</span>
+        <span class="c1"># print(&quot;mask结果\n&quot;,mask)</span>
+
+        <span class="c1"># get mask indices 获取掩码索引</span>
+        <span class="n">mask_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">as_tuple</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># mask input with mask tokens with probability of `replace_prob` (keep tokens the same with probability 1 - replace_prob)</span>
+        <span class="n">masked_input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+
+        <span class="c1"># if random token probability &gt; 0 for mlm</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_token_prob</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;num_tokens keyword must be supplied when instantiating MLM if using random token replacement&#39;</span>
+            <span class="n">random_token_prob</span> <span class="o">=</span> <span class="n">prob_mask_like</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_token_prob</span><span class="p">)</span>
+            <span class="n">random_tokens</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_tokens</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">random_no_mask</span> <span class="o">=</span> <span class="n">mask_with_tokens</span><span class="p">(</span><span class="n">random_tokens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_ignore_token_ids</span><span class="p">)</span>
+            <span class="n">random_token_prob</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">random_no_mask</span>
+            <span class="n">random_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">random_token_prob</span><span class="p">,</span> <span class="n">as_tuple</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">masked_input</span><span class="p">[</span><span class="n">random_indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">random_tokens</span><span class="p">[</span><span class="n">random_indices</span><span class="p">]</span>
+
+        <span class="c1"># [mask] input</span>
+        <span class="n">replace_prob</span> <span class="o">=</span> <span class="n">prob_mask_like</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">replace_prob</span><span class="p">)</span>
+        <span class="c1"># print(&quot;replace_prob&quot;,replace_prob)</span>
+        <span class="n">masked_input</span> <span class="o">=</span> <span class="n">masked_input</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">*</span> <span class="n">replace_prob</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_token_id</span><span class="p">)</span>
+
+        <span class="c1"># mask out any tokens to padding tokens that were not originally going to be masked</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="o">~</span><span class="n">mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_token_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">indices</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">masked_input</span><span class="p">,</span><span class="n">labels</span><span class="p">,</span><span class="n">mask_indices</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">masked_input</span><span class="p">,</span><span class="n">labels</span></div></div>
+</pre></div>
+
+           </div>
+
+
+           <div id="lv-container" data-id="city" data-uid="MTAyMC80OTg1OS8yNjM1MA==">
+            <script type="4097e126b712b9dab1f8fc00-text/javascript">
+                 (function(d, s) {
+                     var j, e = d.getElementsByTagName(s)[0];
+              
+                     if (typeof LivereTower === 'function') { return; }
+              
+                     j = d.createElement(s);
+                     j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                     j.async = true;
+              
+                     e.parentNode.insertBefore(j, e);
+                 })(document, 'script');
+              </script>
+            <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>        
+
+            
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2021, Terry Chan.</p>
+  </div>
+
+  利用 <a href="https://www.sphinx-doc.org/">Sphinx</a> 构建，使用了 
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">主题</a>
+    由 <a href="https://readthedocs.org">Read the Docs</a>开发.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
